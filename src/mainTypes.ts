@@ -8,11 +8,11 @@ export interface RGBAValue {
 export interface Coordinates {
   x: number
   y: number
-  rgba: RGBAValue
 }
 
 export interface Pixel {
   coords: Coordinates
+  rgba: RGBAValue
 }
 
 export type PixelArray = Pixel[]

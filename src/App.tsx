@@ -10,7 +10,12 @@ const canvasSizeTemplates = {
 }
 
 const App = (): React.JSX.Element => {
-  const canvasData: PixelArray = []
+  const canvasData: PixelArray = [
+    {
+      coords: { x: 10, y: 10 },
+      rgba: { R: 0, G: 0, B: 0, A: 100 },
+    },
+  ]
 
   const [canvasSize, setCanvasSize] = useState<Size>(canvasSizeTemplates.NES)
 
