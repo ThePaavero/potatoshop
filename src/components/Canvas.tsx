@@ -1,5 +1,5 @@
-import { MouseEventHandler, useEffect, useRef, useState } from 'react'
-import { Pixel, PixelArray, Size } from '../mainTypes'
+import { useEffect, useRef, useState } from 'react'
+import { Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
 
 export interface CanvasProps {
   data: PixelArray
@@ -12,22 +12,25 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
   const [pixels, setPixels] = useState<PixelArray>([...(data ?? [])])
   const [brushActive, setBrushActive] = useState<boolean>(false)
   const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
+  const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 15, B: 10, A: 100 })
 
-  useEffect(() => {
+  const drawPixels = () => {
     if (pixels.length && context) {
-      console.log(pixels)
+      console.log(pixels.length)
       pixels.forEach((pixel: Pixel) => {
         context.fillStyle = `rgba(${pixel.rgba.R} ${pixel.rgba.G} ${pixel.rgba.B}, ${pixel.rgba.A})`
         context.fillRect(pixel.coords.x, pixel.coords.y, 1, 1)
       })
     }
-  }, [pixels, context, data])
+  }
 
-  const down = (e: any) => {
+  useEffect(drawPixels, [pixels, context, data])
+
+  const down = () => {
     setBrushActive(true)
   }
 
-  const up = (e: any) => {
+  const up = () => {
     setBrushActive(false)
   }
 
@@ -47,12 +50,7 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
       }
       updatedPixels.push({
         coords: { ...mappedCoords },
-        rgba: {
-          R: 255,
-          G: 0,
-          B: 0,
-          A: 100,
-        },
+        rgba: activeColor,
       } as Pixel)
       setPixels(updatedPixels)
     }
