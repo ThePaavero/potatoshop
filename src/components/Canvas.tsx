@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Coordinates, Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
+import { BrushType, Coordinates, Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
 
 export interface CanvasProps {
   data: PixelArray
@@ -11,10 +11,15 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
   const context: CanvasRenderingContext2D = canvasRef?.current?.getContext('2d')
   const [pixels, setPixels] = useState<PixelArray>([...(data ?? [])])
   const [brushActive, setBrushActive] = useState<boolean>(false)
+  const [activeBrushType, setActiveBrushType] = useState<BrushType>('add')
   const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
   const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 15, B: 10, A: 100 })
 
   const drawPixels = () => {
+    if (!context) {
+      return
+    }
+    context.imageSmoothingEnabled = false
     if (pixels.length && context) {
       pixels.forEach((pixel: Pixel) => {
         context.fillStyle = `rgba(${pixel.rgba.R} ${pixel.rgba.G} ${pixel.rgba.B}, ${pixel.rgba.A})`
@@ -25,8 +30,19 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
 
   useEffect(drawPixels, [pixels, context, data, size])
 
-  const down = () => {
+  const down = (e: any) => {
+    e.preventDefault()
     setBrushActive(true)
+    switch (e.button) {
+      case 0:
+        setActiveBrushType('add')
+        addPixelFromEvent(e)
+        break
+      case 1:
+        setActiveBrushType('remove')
+        removePixelFromEvent(e)
+        break
+    }
   }
 
   const up = () => {
@@ -45,15 +61,46 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     setPixels(updatedPixels)
   }
 
+  const removePixel = (coords: Coordinates) => {
+    const matchingPixel = pixels.find((p) => p.coords.x === coords.x && p.coords.y === coords.y)
+    console.log('matchingPixel:', matchingPixel)
+
+    if (!matchingPixel) {
+      return
+    }
+    const updatedPixels = [...pixels].splice(pixels.indexOf(matchingPixel))
+    setPixels(updatedPixels)
+  }
+
+  const addPixelFromEvent = (e: any) => {
+    const { width, height } = canvasRef.current.getBoundingClientRect()
+    const scaleX = size.w / width
+    const scaleY = size.h / height
+    const x = Math.round((e.clientX - canvasRef.current.offsetLeft) * scaleX)
+    const y = Math.round((e.clientY - canvasRef.current.offsetTop) * scaleY)
+    addPixel({ x, y })
+  }
+
+  const removePixelFromEvent = (e: any) => {
+    const { width, height } = canvasRef.current.getBoundingClientRect()
+    const scaleX = size.w / width
+    const scaleY = size.h / height
+    const x = (e.clientX - canvasRef.current.offsetLeft) * scaleX
+    const y = (e.clientY - canvasRef.current.offsetTop) * scaleY
+    removePixel({ x, y })
+  }
+
   const move = (e: any) => {
     setRunningFrameCounter(runningFrameCounter + 1)
     if (brushActive) {
-      const { width, height } = canvasRef.current.getBoundingClientRect()
-      const scaleX = size.w / width
-      const scaleY = size.h / height
-      const x = e.clientX - canvasRef.current.offsetLeft
-      const y = e.clientY - canvasRef.current.offsetTop
-      addPixel({ x: x * scaleX, y: y * scaleY })
+      switch (activeBrushType) {
+        case 'add':
+          addPixelFromEvent(e)
+          break
+        case 'remove':
+          removePixelFromEvent(e)
+          break
+      }
     }
   }
 

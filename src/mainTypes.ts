@@ -22,3 +22,5 @@ export interface Size {
   h: number
   [key: string]: any
 }
+
+export type BrushType = 'add' | 'remove'
