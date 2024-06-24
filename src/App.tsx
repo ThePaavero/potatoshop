@@ -5,6 +5,7 @@ import Canvas from './components/Canvas'
 import { PixelArray, Size } from './mainTypes'
 
 const canvasSizeTemplates = {
+  DEF: { w: 25, h: 25 },
   NES: { w: 256, h: 240 },
   MEGADRIVE: { w: 320, h: 224 },
 }
@@ -17,7 +18,7 @@ const App = (): React.JSX.Element => {
     },
   ]
 
-  const [canvasSize, setCanvasSize] = useState<Size>(canvasSizeTemplates.NES)
+  const [canvasSize, setCanvasSize] = useState<Size>(canvasSizeTemplates.DEF)
 
   return (
     <div className="App">
