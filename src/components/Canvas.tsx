@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
+import { Coordinates, Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
 
 export interface CanvasProps {
   data: PixelArray
@@ -34,25 +34,25 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     setBrushActive(false)
   }
 
+  const addPixel = (coords: Coordinates) => {
+    const updatedPixels = [...pixels]
+    if (pixels.find((p) => p.coords.x === coords.x && p.coords.y === coords.y)) {
+      return
+    }
+    updatedPixels.push({
+      coords: { ...coords },
+      rgba: activeColor,
+    } as Pixel)
+    setPixels(updatedPixels)
+  }
+
   const move = (e: any) => {
     setRunningFrameCounter(runningFrameCounter + 1)
     if (brushActive) {
-      if (!canvasRef.current) {
-        return
-      }
-      const mappedCoords = {
+      addPixel({
         x: e.clientX,
         y: e.clientY,
-      }
-      const updatedPixels = [...pixels]
-      if (pixels.find((p) => p.coords.x === mappedCoords.x && p.coords.y === mappedCoords.y)) {
-        return
-      }
-      updatedPixels.push({
-        coords: { ...mappedCoords },
-        rgba: activeColor,
-      } as Pixel)
-      setPixels(updatedPixels)
+      })
     }
   }
 
