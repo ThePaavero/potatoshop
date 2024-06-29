@@ -19,6 +19,7 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     if (!context) {
       return
     }
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
     context.imageSmoothingEnabled = false
     if (pixels.length && context) {
       pixels.forEach((pixel: Pixel) => {
@@ -63,31 +64,29 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
 
   const removePixel = (coords: Coordinates) => {
     const matchingPixel = pixels.find((p) => p.coords.x === coords.x && p.coords.y === coords.y)
-    console.log('matchingPixel:', matchingPixel)
-
     if (!matchingPixel) {
       return
     }
-    const updatedPixels = [...pixels].splice(pixels.indexOf(matchingPixel))
+    const updatedPixels = [...pixels].filter((p) => p !== matchingPixel)
     setPixels(updatedPixels)
   }
 
-  const addPixelFromEvent = (e: any) => {
+  const translateCoordinatesFromEvent = (e: any) => {
     const { width, height } = canvasRef.current.getBoundingClientRect()
     const scaleX = size.w / width
     const scaleY = size.h / height
-    const x = Math.round((e.clientX - canvasRef.current.offsetLeft) * scaleX)
-    const y = Math.round((e.clientY - canvasRef.current.offsetTop) * scaleY)
-    addPixel({ x, y })
+    return {
+      x: Math.round((e.clientX - canvasRef.current.offsetLeft) * scaleX),
+      y: Math.round((e.clientY - canvasRef.current.offsetTop) * scaleY),
+    }
+  }
+
+  const addPixelFromEvent = (e: any) => {
+    addPixel(translateCoordinatesFromEvent(e))
   }
 
   const removePixelFromEvent = (e: any) => {
-    const { width, height } = canvasRef.current.getBoundingClientRect()
-    const scaleX = size.w / width
-    const scaleY = size.h / height
-    const x = (e.clientX - canvasRef.current.offsetLeft) * scaleX
-    const y = (e.clientY - canvasRef.current.offsetTop) * scaleY
-    removePixel({ x, y })
+    removePixel(translateCoordinatesFromEvent(e))
   }
 
   const move = (e: any) => {
