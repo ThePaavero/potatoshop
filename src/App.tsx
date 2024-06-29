@@ -4,6 +4,7 @@ import MainMenu from './components/MainMenu'
 import Canvas from './components/Canvas'
 import { BrushType, Coordinates, PixelArray, PotatoEvent, RGBAValue, Size } from './mainTypes'
 import resolutionTemplates from './resolutionTemplates'
+import Palette from './components/Palette'
 
 const App = (): React.JSX.Element => {
   const data: PixelArray = []
@@ -24,6 +25,32 @@ const App = (): React.JSX.Element => {
     const updatedEvents = [...history]
     updatedEvents.push(potatoEvent)
     setHistory(updatedEvents)
+  }
+
+  const hexToRgba = (hex: string): RGBAValue => {
+    return {
+      R: parseInt(hex.slice(1, 3), 16),
+      G: parseInt(hex.slice(3, 5), 16),
+      B: parseInt(hex.slice(5, 7), 16),
+      A: 1,
+    }
+  }
+
+  const rgbaToHex = (rgba: RGBAValue) => {
+    const asString = `rgba(${rgba.R},${rgba.G},${rgba.B},${rgba.A})`
+    const forceRemoveAlpha = true
+    return (
+      '#' +
+      asString
+        .replace(/^rgba?\(|\s+|\)$/g, '')
+        .split(',')
+        .filter((_string, index) => !forceRemoveAlpha || index !== 3)
+        .map((string) => parseFloat(string))
+        .map((number, index) => (index === 3 ? Math.round(number * 255) : number))
+        .map((number) => number.toString(16))
+        .map((string) => (string.length === 1 ? '0' + string : string))
+        .join('')
+    )
   }
 
   const canvasData: PixelArray = []
@@ -55,6 +82,12 @@ const App = (): React.JSX.Element => {
           setActivePixelCoordinates,
           setRunningFrameCounter,
           setActiveColor,
+        }}
+      />
+      <Palette
+        activeHex={rgbaToHex(activeColor)}
+        setter={(hex) => {
+          setActiveColor(hexToRgba(hex))
         }}
       />
     </div>

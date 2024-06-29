@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import { CanvasProps, Coordinates, Pixel, PotatoEventType, RGBAValue } from '../mainTypes'
-import Palette from './Palette'
+import { CanvasProps, Coordinates, Pixel, PotatoEventType } from '../mainTypes'
 
 const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX.Element => {
   const {
@@ -21,7 +20,6 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     addToHistoryEvents,
     setActivePixelCoordinates,
     setRunningFrameCounter,
-    setActiveColor,
   } = appFunctions
   const drawPixels = () => {
     if (!context) {
@@ -133,41 +131,9 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     }
   }
 
-  const hexToRgba = (hex: string): RGBAValue => {
-    return {
-      R: parseInt(hex.slice(1, 3), 16),
-      G: parseInt(hex.slice(3, 5), 16),
-      B: parseInt(hex.slice(5, 7), 16),
-      A: 1,
-    }
-  }
-
-  const rgbaToHex = (rgba: RGBAValue) => {
-    const asString = `rgba(${rgba.R},${rgba.G},${rgba.B},${rgba.A})`
-    const forceRemoveAlpha = true
-    return (
-      '#' +
-      asString
-        .replace(/^rgba?\(|\s+|\)$/g, '')
-        .split(',')
-        .filter((_string, index) => !forceRemoveAlpha || index !== 3)
-        .map((string) => parseFloat(string))
-        .map((number, index) => (index === 3 ? Math.round(number * 255) : number))
-        .map((number) => number.toString(16))
-        .map((string) => (string.length === 1 ? '0' + string : string))
-        .join('')
-    )
-  }
-
   return (
     <>
       <span style={{ display: 'none' }}>{runningFrameCounter}</span>
-      <Palette
-        activeHex={rgbaToHex(activeColor)}
-        setter={(hex) => {
-          setActiveColor(hexToRgba(hex))
-        }}
-      />
       <canvas
         width={size.w}
         height={size.h}
