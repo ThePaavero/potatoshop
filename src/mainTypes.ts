@@ -51,3 +51,8 @@ export interface PotatoEvent {
   eventType: PotatoEventType
   pixel: Pixel
 }
+
+export interface Palette {
+  name: string
+  colors: string[]
+}

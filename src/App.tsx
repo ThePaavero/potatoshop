@@ -4,7 +4,8 @@ import MainMenu from './components/MainMenu'
 import Canvas from './components/Canvas'
 import { BrushType, Coordinates, PixelArray, PotatoEvent, RGBAValue, Size } from './mainTypes'
 import resolutionTemplates from './resolutionTemplates'
-import Palette from './components/Palette'
+import PaletteTool from './components/PaletteTool'
+import { palettes } from './palettes'
 
 const App = (): React.JSX.Element => {
   const data: PixelArray = []
@@ -20,6 +21,7 @@ const App = (): React.JSX.Element => {
   const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 150, B: 10, A: 100 })
   const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
   const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
+  const [paletteId, setPaletteId] = useState<string>('NES')
 
   const addToHistoryEvents = (potatoEvent: PotatoEvent) => {
     const updatedEvents = [...history]
@@ -84,11 +86,14 @@ const App = (): React.JSX.Element => {
           setActiveColor,
         }}
       />
-      <Palette
+      <PaletteTool
         activeHex={rgbaToHex(activeColor)}
         setter={(hex) => {
           setActiveColor(hexToRgba(hex))
         }}
+        palettes={palettes}
+        paletteId={paletteId}
+        setPaletteId={setPaletteId}
       />
     </div>
   )

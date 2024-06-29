@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { palettes } from '../palettes'
+import { Palette } from '../mainTypes'
 
 export interface PaletteProps {
   activeHex?: string
   setter: (arg0: string) => void
+  palettes: Palette[]
+  paletteId: string
+  setPaletteId: (arg0: string) => void
 }
 
-const Palette = ({ activeHex, setter }: PaletteProps): React.JSX.Element => {
-  const [paletteId, setPaletteId] = useState<string>('NES')
-
+const PaletteTool = ({ activeHex, setter, palettes, paletteId, setPaletteId }: PaletteProps): React.JSX.Element => {
   return (
     <div className="palette-wrapper">
       <nav>
@@ -16,7 +16,7 @@ const Palette = ({ activeHex, setter }: PaletteProps): React.JSX.Element => {
           onChange={(e: any) => {
             const slug: string = e.target.value
             const matchingPalette = palettes.find((p) => p.name === slug) ?? palettes[0]
-            setPaletteId(matchingPalette?.name)
+            setPaletteId(matchingPalette.name)
           }}
         >
           {palettes.map((p) => {
@@ -48,4 +48,4 @@ const Palette = ({ activeHex, setter }: PaletteProps): React.JSX.Element => {
   )
 }
 
-export default Palette
+export default PaletteTool

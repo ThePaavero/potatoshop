@@ -1,4 +1,6 @@
-export const palettes = [
+import { Palette } from './mainTypes'
+
+export const palettes: Palette[] = [
   {
     name: 'NES',
     colors: [
