@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { MouseEventHandler, useEffect, useRef, useState } from 'react'
 import { BrushType, Coordinates, Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
 
 export interface CanvasProps {
@@ -14,6 +14,8 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
   const [activeBrushType, setActiveBrushType] = useState<BrushType>('add')
   const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
   const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 15, B: 10, A: 100 })
+  const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
+  const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
 
   const drawPixels = () => {
     if (!context) {
@@ -23,13 +25,25 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     context.imageSmoothingEnabled = false
     if (pixels.length && context) {
       pixels.forEach((pixel: Pixel) => {
-        context.fillStyle = `rgba(${pixel.rgba.R} ${pixel.rgba.G} ${pixel.rgba.B}, ${pixel.rgba.A})`
+        context.fillStyle = `rgba(${pixel.rgba.R},${pixel.rgba.G},${pixel.rgba.B},${pixel.rgba.A})`
         context.fillRect(pixel.coords.x, pixel.coords.y, 1, 1)
       })
     }
+    if (showActivePixelCoordinates && activePixelCoordinates) {
+      context.fillStyle = `rgba(${255},${255},${255},${0.5})`
+      context.fillRect(activePixelCoordinates.x, activePixelCoordinates.y, 1, 1)
+    }
   }
 
-  useEffect(drawPixels, [pixels, context, data, size])
+  useEffect(drawPixels, [
+    pixels,
+    context,
+    runningFrameCounter,
+    data,
+    size,
+    showActivePixelCoordinates,
+    activePixelCoordinates,
+  ])
 
   const down = (e: any) => {
     e.preventDefault()
@@ -89,6 +103,10 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     removePixel(translateCoordinatesFromEvent(e))
   }
 
+  const indicateHoveringPixel = (e: any) => {
+    setActivePixelCoordinates(translateCoordinatesFromEvent(e))
+  }
+
   const move = (e: any) => {
     setRunningFrameCounter(runningFrameCounter + 1)
     if (brushActive) {
@@ -100,6 +118,8 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
           removePixelFromEvent(e)
           break
       }
+    } else {
+      indicateHoveringPixel(e)
     }
   }
 
