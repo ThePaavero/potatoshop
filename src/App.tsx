@@ -38,9 +38,8 @@ const App = (): React.JSX.Element => {
     }
   }
 
-  const rgbaToHex = (rgba: RGBAValue) => {
+  const rgbaToHex = (rgba: RGBAValue, forceRemoveAlpha = true) => {
     const asString = `rgba(${rgba.R},${rgba.G},${rgba.B},${rgba.A})`
-    const forceRemoveAlpha = true
     return (
       '#' +
       asString
