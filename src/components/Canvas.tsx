@@ -7,6 +7,16 @@ export interface CanvasProps {
   size: Size
 }
 
+export enum PotatoEventType {
+  ADD_PIXEL = 'addPixel',
+  REMOVE_PIXEL = 'removePixel',
+}
+
+export interface PotatoEvent {
+  eventType: PotatoEventType
+  pixel: Pixel
+}
+
 const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
   const canvasRef = useRef<any>()
   const context: CanvasRenderingContext2D = canvasRef?.current?.getContext('2d')
@@ -17,6 +27,7 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
   const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 150, B: 10, A: 100 })
   const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
   const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
+  const [history, setHistory] = useState<PotatoEvent[]>([])
 
   const drawPixels = () => {
     if (!context) {
@@ -65,16 +76,25 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     setBrushActive(false)
   }
 
+  const addToHistoryEvents = (potatoEvent: PotatoEvent) => {
+    const updatedEvents = [...history]
+    updatedEvents.push(potatoEvent)
+    setHistory(updatedEvents)
+  }
+
   const addPixel = (coords: Coordinates) => {
     const updatedPixels = [...pixels]
-    if (pixels.find((p) => p.coords.x === coords.x && p.coords.y === coords.y)) {
-      return
-    }
-    updatedPixels.push({
+    removePixel(coords)
+    const asPixel = {
       coords: { ...coords },
       rgba: activeColor,
-    } as Pixel)
+    } as Pixel
+    updatedPixels.push(asPixel)
     setPixels(updatedPixels)
+    addToHistoryEvents({
+      eventType: PotatoEventType.ADD_PIXEL,
+      pixel: asPixel,
+    })
   }
 
   const removePixel = (coords: Coordinates) => {
