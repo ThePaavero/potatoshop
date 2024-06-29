@@ -25,10 +25,21 @@ export interface Size {
 
 export type BrushType = 'add' | 'remove'
 
+export type AppFunctions = {
+  addToHistoryEvents: (arg0: PotatoEvent) => void
+  setBrushActive: (arg0: boolean) => void
+  setActiveBrushType: (arg0: BrushType) => void
+  setPixels: (arg0: PixelArray) => void
+  setActivePixelCoordinates: (arg0: Coordinates) => void
+  setRunningFrameCounter: (arg0: number) => void
+  setActiveColor: (arg0: RGBAValue) => void
+}
+
 export interface CanvasProps {
   data: PixelArray
   size: Size
-  addToHistoryEvents: (arg0: PotatoEvent) => void
+  stateVars: any
+  appFunctions: AppFunctions
 }
 
 export enum PotatoEventType {

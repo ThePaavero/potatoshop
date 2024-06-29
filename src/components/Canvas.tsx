@@ -1,18 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
-import { BrushType, CanvasProps, Coordinates, Pixel, PixelArray, PotatoEventType, RGBAValue } from '../mainTypes'
+import { useEffect } from 'react'
+import { CanvasProps, Coordinates, Pixel, PotatoEventType, RGBAValue } from '../mainTypes'
 import Palette from './Palette'
 
-const Canvas = ({ data, size, addToHistoryEvents }: CanvasProps): React.JSX.Element => {
-  const canvasRef = useRef<any>()
-  const context: CanvasRenderingContext2D = canvasRef?.current?.getContext('2d')
-  const [pixels, setPixels] = useState<PixelArray>([...(data ?? [])])
-  const [brushActive, setBrushActive] = useState<boolean>(false)
-  const [activeBrushType, setActiveBrushType] = useState<BrushType>('add')
-  const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
-  const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 150, B: 10, A: 100 })
-  const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
-  const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
-
+const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX.Element => {
+  const {
+    canvasRef,
+    context,
+    pixels,
+    showActivePixelCoordinates,
+    activePixelCoordinates,
+    activeBrushType,
+    runningFrameCounter,
+    activeColor,
+    brushActive,
+  } = stateVars
+  const {
+    setBrushActive,
+    setActiveBrushType,
+    setPixels,
+    addToHistoryEvents,
+    setActivePixelCoordinates,
+    setRunningFrameCounter,
+    setActiveColor,
+  } = appFunctions
   const drawPixels = () => {
     if (!context) {
       return
@@ -39,6 +49,7 @@ const Canvas = ({ data, size, addToHistoryEvents }: CanvasProps): React.JSX.Elem
     size,
     showActivePixelCoordinates,
     activePixelCoordinates,
+    canvasRef,
   ])
 
   const down = (e: any) => {
@@ -76,7 +87,7 @@ const Canvas = ({ data, size, addToHistoryEvents }: CanvasProps): React.JSX.Elem
   }
 
   const removePixel = (coords: Coordinates) => {
-    const matchingPixel = pixels.find((p) => p.coords.x === coords.x && p.coords.y === coords.y)
+    const matchingPixel = pixels.find((p: Pixel) => p.coords.x === coords.x && p.coords.y === coords.y)
     if (!matchingPixel) {
       return
     }
