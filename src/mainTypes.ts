@@ -24,3 +24,19 @@ export interface Size {
 }
 
 export type BrushType = 'add' | 'remove'
+
+export interface CanvasProps {
+  data: PixelArray
+  size: Size
+  addToHistoryEvents: (arg0: PotatoEvent) => void
+}
+
+export enum PotatoEventType {
+  ADD_PIXEL = 'addPixel',
+  REMOVE_PIXEL = 'removePixel',
+}
+
+export interface PotatoEvent {
+  eventType: PotatoEventType
+  pixel: Pixel
+}
