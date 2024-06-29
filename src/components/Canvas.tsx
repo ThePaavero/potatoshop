@@ -1,5 +1,6 @@
-import { MouseEventHandler, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BrushType, Coordinates, Pixel, PixelArray, RGBAValue, Size } from '../mainTypes'
+import Palette from './Palette'
 
 export interface CanvasProps {
   data: PixelArray
@@ -13,7 +14,7 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
   const [brushActive, setBrushActive] = useState<boolean>(false)
   const [activeBrushType, setActiveBrushType] = useState<BrushType>('add')
   const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
-  const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 15, B: 10, A: 100 })
+  const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 150, B: 10, A: 100 })
   const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
   const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
 
@@ -123,9 +124,41 @@ const Canvas = ({ data, size }: CanvasProps): React.JSX.Element => {
     }
   }
 
+  const hexToRgba = (hex: string): RGBAValue => {
+    return {
+      R: parseInt(hex.slice(1, 3), 16),
+      G: parseInt(hex.slice(3, 5), 16),
+      B: parseInt(hex.slice(5, 7), 16),
+      A: 1,
+    }
+  }
+
+  const rgbaToHex = (rgba: RGBAValue) => {
+    const asString = `rgba(${rgba.R},${rgba.G},${rgba.B},${rgba.A})`
+    const forceRemoveAlpha = true
+    return (
+      '#' +
+      asString
+        .replace(/^rgba?\(|\s+|\)$/g, '')
+        .split(',')
+        .filter((_string, index) => !forceRemoveAlpha || index !== 3)
+        .map((string) => parseFloat(string))
+        .map((number, index) => (index === 3 ? Math.round(number * 255) : number))
+        .map((number) => number.toString(16))
+        .map((string) => (string.length === 1 ? '0' + string : string))
+        .join('')
+    )
+  }
+
   return (
     <>
       <span style={{ display: 'none' }}>{runningFrameCounter}</span>
+      <Palette
+        activeHex={rgbaToHex(activeColor)}
+        setter={(hex) => {
+          setActiveColor(hexToRgba(hex))
+        }}
+      />
       <canvas
         width={size.w}
         height={size.h}
