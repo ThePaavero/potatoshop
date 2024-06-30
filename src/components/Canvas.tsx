@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent } from '../mainTypes'
 import { translateCoordinatesFromEvent } from '../commonUtils'
 
@@ -14,6 +14,7 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     activeColor,
     brushActive,
   } = stateVars
+
   const {
     setBrushActive,
     setActiveBrushType,
@@ -22,6 +23,9 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     setActivePixelCoordinates,
     setRunningFrameCounter,
   } = appFunctions
+
+  const [cursorCoordinates, setCursorCoordinates] = useState<Coordinates>({ x: 0, y: 0 })
+
   const drawPixels = () => {
     if (!context) {
       return
@@ -57,11 +61,11 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     switch (e.button) {
       case 0:
         setActiveBrushType('add')
-        addPixelFromEvent(e)
+        addPixel()
         break
       case 1:
         setActiveBrushType('remove')
-        removePixelFromEvent(e)
+        removePixel()
         break
     }
   }
@@ -70,11 +74,11 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     setBrushActive(false)
   }
 
-  const addPixel = (coords: Coordinates) => {
+  const addPixel = () => {
     const updatedPixels = [...pixels]
-    removePixel(coords)
+    removePixel()
     const asPixel = {
-      coords: { ...coords },
+      coords: { ...cursorCoordinates },
       rgba: activeColor,
     } as Pixel
     updatedPixels.push(asPixel)
@@ -85,7 +89,8 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     })
   }
 
-  const removePixel = (coords: Coordinates) => {
+  const removePixel = () => {
+    const coords = cursorCoordinates
     const matchingPixel = pixels.find((p: Pixel) => p.coords.x === coords.x && p.coords.y === coords.y)
     if (!matchingPixel) {
       return
@@ -94,31 +99,24 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     setPixels(updatedPixels)
   }
 
-  const addPixelFromEvent = (e: InputEvent) => {
-    addPixel(translateCoordinatesFromEvent(e, canvasRef.current, size))
-  }
-
-  const removePixelFromEvent = (e: InputEvent) => {
-    removePixel(translateCoordinatesFromEvent(e, canvasRef.current, size))
-  }
-
-  const indicateHoveringPixel = (e: InputEvent) => {
-    setActivePixelCoordinates(translateCoordinatesFromEvent(e, canvasRef.current, size))
+  const indicateHoveringPixel = () => {
+    setActivePixelCoordinates(cursorCoordinates)
   }
 
   const move = (e: InputEvent) => {
     setRunningFrameCounter(runningFrameCounter + 1)
+    setCursorCoordinates(translateCoordinatesFromEvent(e, canvasRef.current, size))
     if (brushActive) {
       switch (activeBrushType) {
         case 'add':
-          addPixelFromEvent(e)
+          addPixel()
           break
         case 'remove':
-          removePixelFromEvent(e)
+          removePixel()
           break
       }
     } else {
-      indicateHoveringPixel(e)
+      indicateHoveringPixel()
     }
   }
 
