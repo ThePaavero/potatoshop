@@ -129,9 +129,9 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
         style={{ height: `${(size.h / size.w) * 100}vh` }}
         id="main-canvas"
         ref={canvasRef}
-        onMouseDownCapture={down}
+        onMouseDownCapture={down as any}
         onMouseUpCapture={up}
-        onMouseMoveCapture={move}
+        onMouseMoveCapture={move as any}
       >
         Canvas is not supported.
       </canvas>

@@ -26,7 +26,7 @@ export interface Size {
 export type BrushType = 'add' | 'remove'
 
 export type AppFunctions = {
-  addToHistoryEvents: (arg0: PotatoEvent) => void
+  addToHistoryEvents: (arg0: PotatoHistoryEvent) => void
   setBrushActive: (arg0: boolean) => void
   setActiveBrushType: (arg0: BrushType) => void
   setPixels: (arg0: PixelArray) => void
@@ -47,7 +47,7 @@ export enum PotatoEventType {
   REMOVE_PIXEL = 'removePixel',
 }
 
-export interface PotatoEvent {
+export interface PotatoHistoryEvent {
   eventType: PotatoEventType
   pixel: Pixel
 }
@@ -60,4 +60,5 @@ export interface Palette {
 export interface InputEvent {
   button: any
   preventDefault: () => void
+  key: string | number
 }

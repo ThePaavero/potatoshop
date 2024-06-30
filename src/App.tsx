@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import './App.scss'
 import MainMenu from './components/MainMenu'
 import Canvas from './components/Canvas'
-import { BrushType, Coordinates, PixelArray, PotatoEvent, RGBAValue, Size } from './mainTypes'
+import { BrushType, Coordinates, PixelArray, PotatoHistoryEvent, RGBAValue, Size, InputEvent } from './mainTypes'
 import resolutionTemplates from './resolutionTemplates'
 import PaletteTool from './components/PaletteTool'
 import { palettes } from './palettes'
@@ -11,7 +11,7 @@ const App = (): React.JSX.Element => {
   const data: PixelArray = []
 
   const [canvasSize] = useState<Size>(resolutionTemplates.DEF)
-  const [history, setHistory] = useState<PotatoEvent[]>([])
+  const [history, setHistory] = useState<PotatoHistoryEvent[]>([])
   const canvasRef = useRef<any>()
   const context: CanvasRenderingContext2D = canvasRef?.current?.getContext('2d')
   const [pixels, setPixels] = useState<PixelArray>([...(data ?? [])])
@@ -22,10 +22,52 @@ const App = (): React.JSX.Element => {
   const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
   const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
   const [paletteId, setPaletteId] = useState<string>('NES')
+  const [keysDown, setKeysDown] = useState<string[]>([])
+  const [drawStraightLines, setDrawStraightLines] = useState<boolean>(false)
 
-  const addToHistoryEvents = (potatoEvent: PotatoEvent) => {
+  const handleKeyDown = useCallback(
+    (e: { key: any }) => {
+      const key = String(e.key).toLowerCase()
+      if (key in keysDown) {
+        return
+      }
+      const updatedKeys = [...keysDown]
+      updatedKeys.push(key)
+      setKeysDown(updatedKeys)
+    },
+    [keysDown]
+  )
+
+  const handleKeyUp = useCallback(
+    (e: { key: any }) => {
+      const key = String(e.key).toLowerCase()
+      const updatedKeys = keysDown.filter((kd) => kd !== key)
+      setKeysDown(updatedKeys)
+    },
+    [keysDown]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
+
+  useEffect(() => {
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [handleKeyUp])
+
+  useEffect(() => {
+    setDrawStraightLines(keysDown.includes('shift'))
+  }, [keysDown])
+
+  const addToHistoryEvents = (PotatoHistoryEvent: PotatoHistoryEvent) => {
     const updatedEvents = [...history]
-    updatedEvents.push(potatoEvent)
+    updatedEvents.push(PotatoHistoryEvent)
     setHistory(updatedEvents)
   }
 
