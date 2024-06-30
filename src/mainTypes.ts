@@ -56,3 +56,8 @@ export interface Palette {
   name: string
   colors: string[]
 }
+
+export interface InputEvent {
+  button: any
+  preventDefault: () => void
+}

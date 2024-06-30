@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { CanvasProps, Coordinates, Pixel, PotatoEventType } from '../mainTypes'
+import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent } from '../mainTypes'
+import { translateCoordinatesFromEvent } from '../commonUtils'
 
 const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX.Element => {
   const {
@@ -50,7 +51,7 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     canvasRef,
   ])
 
-  const down = (e: any) => {
+  const down = (e: InputEvent) => {
     e.preventDefault()
     setBrushActive(true)
     switch (e.button) {
@@ -93,29 +94,19 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
     setPixels(updatedPixels)
   }
 
-  const translateCoordinatesFromEvent = (e: any) => {
-    const { width, height } = canvasRef.current.getBoundingClientRect()
-    const scaleX = size.w / width
-    const scaleY = size.h / height
-    return {
-      x: Math.round((e.clientX - canvasRef.current.offsetLeft) * scaleX),
-      y: Math.round((e.clientY - canvasRef.current.offsetTop) * scaleY),
-    }
+  const addPixelFromEvent = (e: InputEvent) => {
+    addPixel(translateCoordinatesFromEvent(e, canvasRef.current, size))
   }
 
-  const addPixelFromEvent = (e: any) => {
-    addPixel(translateCoordinatesFromEvent(e))
+  const removePixelFromEvent = (e: InputEvent) => {
+    removePixel(translateCoordinatesFromEvent(e, canvasRef.current, size))
   }
 
-  const removePixelFromEvent = (e: any) => {
-    removePixel(translateCoordinatesFromEvent(e))
+  const indicateHoveringPixel = (e: InputEvent) => {
+    setActivePixelCoordinates(translateCoordinatesFromEvent(e, canvasRef.current, size))
   }
 
-  const indicateHoveringPixel = (e: any) => {
-    setActivePixelCoordinates(translateCoordinatesFromEvent(e))
-  }
-
-  const move = (e: any) => {
+  const move = (e: InputEvent) => {
     setRunningFrameCounter(runningFrameCounter + 1)
     if (brushActive) {
       switch (activeBrushType) {
