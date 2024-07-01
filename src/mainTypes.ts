@@ -40,6 +40,7 @@ export interface CanvasProps {
   size: Size
   stateVars: any
   appFunctions: AppFunctions
+  keysDown: string[]
 }
 
 export enum PotatoEventType {

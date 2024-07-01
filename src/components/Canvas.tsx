@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent } from '../mainTypes'
 import { translateCoordinatesFromEvent } from '../commonUtils'
 
-const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX.Element => {
+const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps): React.JSX.Element => {
   const {
     canvasRef,
     context,
@@ -25,6 +25,11 @@ const Canvas = ({ data, size, stateVars, appFunctions }: CanvasProps): React.JSX
   } = appFunctions
 
   const [cursorCoordinates, setCursorCoordinates] = useState<Coordinates>({ x: 0, y: 0 })
+  const [drawStraightLines, setDrawStraightLines] = useState<boolean>(false)
+
+  useEffect(() => {
+    setDrawStraightLines(keysDown.length > 0 && keysDown.includes('shift'))
+  }, [keysDown])
 
   const drawPixels = () => {
     if (!context) {
