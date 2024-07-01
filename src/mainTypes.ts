@@ -63,3 +63,5 @@ export interface InputEvent {
   preventDefault: () => void
   key: string | number
 }
+
+export type Axis = 'x' | 'y'

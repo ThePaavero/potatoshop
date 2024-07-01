@@ -37,15 +37,12 @@ const App = (): React.JSX.Element => {
       updatedKeys.push(key)
       setKeysDown(updatedKeys)
     }
-
     const onUp = (e: any) => {
       const key = String(e.key).toLowerCase()
       setKeysDown(keysDown.filter((kd: string) => kd !== key))
     }
-
     window.addEventListener('keydown', onDown)
     window.addEventListener('keyup', onUp)
-
     setLoaded(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded])
