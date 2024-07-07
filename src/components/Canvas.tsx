@@ -26,19 +26,16 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
 
   const [cursorCoordinates, setCursorCoordinates] = useState<Coordinates>({ x: 0, y: 0 })
   const [drawStraightLines, setDrawStraightLines] = useState<Axis | undefined>(undefined)
-  const [previousCoords, setPreviousCoords] = useState<Coordinates>()
+  const [previousCoordinates, setPreviousCoordinates] = useState<Coordinates>()
 
   useEffect(() => {
-    // if (drawStraightLines) {
-    //   // Ignore any new movement.
-    //   return
-    // }
-    // const keyIsDown = keysDown.length > 0 && keysDown.includes('q')
-    // if (!keyIsDown || !previousCoords?.x) {
-    //   setDrawStraightLines(undefined)
-    //   return
-    // }
-    // setDrawStraightLines(getMovementAxis(previousCoords, cursorCoordinates))
+    if (keysDown.includes('x')) {
+      setDrawStraightLines('y')
+    } else if (keysDown.includes('y')) {
+      setDrawStraightLines('x')
+    } else {
+      setDrawStraightLines(undefined)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keysDown])
 
@@ -119,30 +116,14 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
     setActivePixelCoordinates(cursorCoordinates)
   }
 
-  const getMovementAxis = (prev: Coordinates, next: Coordinates): Axis | undefined => {
-    const deltas: Coordinates = {
-      x: Math.abs(prev.x - next.x),
-      y: Math.abs(prev.y - next.y),
-    }
-    return deltas.x > deltas.y ? 'x' : 'y'
-  }
-
   const move = (e: InputEvent) => {
     setRunningFrameCounter(runningFrameCounter + 1)
     const translatedCoordinates: Coordinates = translateCoordinatesFromEvent(e, canvasRef.current, size)
     let translatedCoordinatesToSet = { ...translatedCoordinates }
-    // Drawing straight lines. We need to know which axis we need to "lock".
-    if (drawStraightLines && previousCoords) {
-      const axisToLock = getMovementAxis(previousCoords, translatedCoordinatesToSet)
-      if (axisToLock) {
-        if (axisToLock === 'x') {
-          translatedCoordinatesToSet = { ...translatedCoordinates, x: previousCoords.x }
-        } else {
-          translatedCoordinatesToSet = { ...translatedCoordinates, y: previousCoords.y }
-        }
-      }
+    if (drawStraightLines && previousCoordinates) {
+      translatedCoordinatesToSet[drawStraightLines] = previousCoordinates[drawStraightLines]
     }
-    setPreviousCoords(translatedCoordinatesToSet)
+    setPreviousCoordinates(translatedCoordinatesToSet)
     setCursorCoordinates(translatedCoordinatesToSet)
     if (brushActive) {
       switch (activeBrushType) {
