@@ -65,3 +65,5 @@ export interface InputEvent {
 }
 
 export type Axis = 'x' | 'y'
+
+export type Tool = 'brush' | 'fill'

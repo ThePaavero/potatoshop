@@ -13,6 +13,7 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
     runningFrameCounter,
     activeColor,
     brushActive,
+    activeTool,
   } = stateVars
 
   const {
@@ -66,6 +67,7 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
     showActivePixelCoordinates,
     activePixelCoordinates,
     canvasRef,
+    activeTool,
   ])
 
   const down = (e: InputEvent) => {

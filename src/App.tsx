@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
 import './App.scss'
+import React, { useEffect, useRef, useState } from 'react'
+import { BrushType, Coordinates, PixelArray, PotatoHistoryEvent, RGBAValue, Size, Tool } from './mainTypes'
+import { palettes } from './palettes'
+import resolutionTemplates from './resolutionTemplates'
 import MainMenu from './components/MainMenu'
 import Canvas from './components/Canvas'
-import { BrushType, Coordinates, PixelArray, PotatoHistoryEvent, RGBAValue, Size } from './mainTypes'
-import resolutionTemplates from './resolutionTemplates'
 import PaletteTool from './components/PaletteTool'
-import { palettes } from './palettes'
+import ToolTool from './components/ToolTool'
 
 const App = (): React.JSX.Element => {
   const data: PixelArray = []
@@ -19,10 +20,11 @@ const App = (): React.JSX.Element => {
   const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
   const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 150, B: 10, A: 100 })
   const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
-  const [showActivePixelCoordinates, setShowActivePixelCoordinates] = useState<boolean>(true)
+  const [showActivePixelCoordinates] = useState<boolean>(true)
   const [paletteId, setPaletteId] = useState<string>('NES')
   const [keysDown, setKeysDown] = useState<any>([])
   const [loaded, setLoaded] = useState<boolean>(false)
+  const [activeTool, setActiveTool] = useState<Tool>('brush')
 
   useEffect(() => {
     if (loaded) {
@@ -98,6 +100,7 @@ const App = (): React.JSX.Element => {
           runningFrameCounter,
           activeColor,
           brushActive,
+          activeTool,
         }}
         keysDown={keysDown}
         appFunctions={{
@@ -118,6 +121,12 @@ const App = (): React.JSX.Element => {
         palettes={palettes}
         paletteId={paletteId}
         setPaletteId={setPaletteId}
+      />
+      <ToolTool
+        currentTool={activeTool}
+        setter={(toolString: Tool) => {
+          setActiveTool(toolString)
+        }}
       />
     </div>
   )
