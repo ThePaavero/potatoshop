@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent, Axis } from '../mainTypes'
+import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent, Axis, RGBAValue } from '../mainTypes'
 import { translateCoordinatesFromEvent } from '../commonUtils'
 
 const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps): React.JSX.Element => {
@@ -72,16 +72,20 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
 
   const down = (e: InputEvent) => {
     e.preventDefault()
-    setBrushActive(true)
-    switch (e.button) {
-      case 0:
-        setActiveBrushType('add')
-        addPixel()
-        break
-      case 1:
-        setActiveBrushType('remove')
-        removePixel()
-        break
+    if (activeTool === 'brush') {
+      setBrushActive(true)
+      switch (e.button) {
+        case 0:
+          setActiveBrushType('add')
+          addPixel()
+          break
+        case 1:
+          setActiveBrushType('remove')
+          removePixel()
+          break
+      }
+    } else if (activeTool === 'fill') {
+      fillArea()
     }
   }
 
@@ -116,6 +120,22 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
 
   const indicateHoveringPixel = () => {
     setActivePixelCoordinates(cursorCoordinates)
+  }
+
+  const getRgbaFromCoordinates = ({ x, y }: Coordinates): RGBAValue => {
+    const arr = context.getImageData(x, y, 1, 1).data
+    return {
+      R: arr[0],
+      G: arr[1],
+      B: arr[2],
+      A: arr[3],
+    }
+  }
+
+  const fillArea = () => {
+    const { x, y } = { ...cursorCoordinates }
+    const matchRgba = getRgbaFromCoordinates({ x, y })
+    console.log('matchRgba:', matchRgba)
   }
 
   const move = (e: InputEvent) => {

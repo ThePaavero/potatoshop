@@ -18,7 +18,7 @@ const App = (): React.JSX.Element => {
   const [brushActive, setBrushActive] = useState<boolean>(false)
   const [activeBrushType, setActiveBrushType] = useState<BrushType>('add')
   const [runningFrameCounter, setRunningFrameCounter] = useState<number>(0)
-  const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 255, G: 150, B: 10, A: 100 })
+  const [activeColor, setActiveColor] = useState<RGBAValue>({ R: 0, G: 0, B: 0, A: 1 })
   const [activePixelCoordinates, setActivePixelCoordinates] = useState<Coordinates>()
   const [showActivePixelCoordinates] = useState<boolean>(true)
   const [paletteId, setPaletteId] = useState<string>('NES')
