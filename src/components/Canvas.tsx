@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent, Axis, RGBAValue } from '../mainTypes'
+import { CanvasProps, Coordinates, Pixel, PotatoEventType, InputEvent, Axis, RGBAValue, Tool } from '../mainTypes'
 import { translateCoordinatesFromEvent } from '../commonUtils'
 
 const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps): React.JSX.Element => {
@@ -23,11 +23,13 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
     addToHistoryEvents,
     setActivePixelCoordinates,
     setRunningFrameCounter,
+    setActiveTool,
   } = appFunctions
 
   const [cursorCoordinates, setCursorCoordinates] = useState<Coordinates>({ x: 0, y: 0 })
   const [drawStraightLines, setDrawStraightLines] = useState<Axis | undefined>(undefined)
   const [previousCoordinates, setPreviousCoordinates] = useState<Coordinates>()
+  const [previousActiveTool, setPreviousActiveTool] = useState<Tool>(activeTool)
 
   useEffect(() => {
     if (keysDown.includes('x')) {
@@ -36,6 +38,15 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
       setDrawStraightLines('x')
     } else {
       setDrawStraightLines(undefined)
+    }
+
+    if (keysDown.includes(' ')) {
+      setActiveTool('drag')
+      if (activeTool !== 'drag') {
+        setPreviousActiveTool(activeTool)
+      }
+    } else {
+      setActiveTool(previousActiveTool)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keysDown])
@@ -148,13 +159,15 @@ const Canvas = ({ data, size, stateVars, appFunctions, keysDown }: CanvasProps):
     setPreviousCoordinates(translatedCoordinatesToSet)
     setCursorCoordinates(translatedCoordinatesToSet)
     if (brushActive) {
-      switch (activeBrushType) {
-        case 'add':
-          addPixel()
-          break
-        case 'remove':
-          removePixel()
-          break
+      if (activeTool === 'brush') {
+        switch (activeBrushType) {
+          case 'add':
+            addPixel()
+            break
+          case 'remove':
+            removePixel()
+            break
+        }
       }
     } else {
       indicateHoveringPixel()

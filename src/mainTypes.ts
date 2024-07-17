@@ -33,6 +33,7 @@ export type AppFunctions = {
   setActivePixelCoordinates: (arg0: Coordinates) => void
   setRunningFrameCounter: (arg0: number) => void
   setActiveColor: (arg0: RGBAValue) => void
+  setActiveTool: (arg0: Tool) => void
 }
 
 export interface CanvasProps {
@@ -66,4 +67,4 @@ export interface InputEvent {
 
 export type Axis = 'x' | 'y'
 
-export type Tool = 'brush' | 'fill'
+export type Tool = 'brush' | 'fill' | 'drag'

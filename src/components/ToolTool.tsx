@@ -1,6 +1,7 @@
 import { Tool } from '../mainTypes'
 import { MdBrush } from '@react-icons/all-files/md/MdBrush'
 import { MdFormatPaint } from '@react-icons/all-files/md/MdFormatPaint'
+import { FaHandRock } from '@react-icons/all-files/fa/FaHandRock'
 
 export interface ToolProps {
   currentTool: Tool
@@ -10,12 +11,13 @@ export interface ToolProps {
 const toolStringsToIcons: any = {
   brush: <MdBrush title="Brush" />,
   fill: <MdFormatPaint title="Fill" />,
+  drag: <FaHandRock title="Drag" />,
 }
 
 const ToolTool = ({ currentTool, setter }: ToolProps): React.JSX.Element => {
   return (
     <div className="tool-tool-wrapper">
-      {['brush', 'fill'].map((toolString) => {
+      {Object.keys(toolStringsToIcons).map((toolString) => {
         return (
           <div
             key={toolString}

@@ -111,6 +111,7 @@ const App = (): React.JSX.Element => {
           setActivePixelCoordinates,
           setRunningFrameCounter,
           setActiveColor,
+          setActiveTool,
         }}
       />
       <PaletteTool
